@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+	<springProperty scope="context" name="ROOT_LOG_DIR" source="logging.path"/>
+	<springProperty scope="context" name="LOG_LEVEL" source="logging.level"/>
+	<springProperty scope="context" name="CALL_LOG_DIR" source="logging.callInfo.dir"/>
+	<springProperty scope="context" name="APPLICATIONNAME"
+					source="spring.application.name"/>
+
+	<!-- RLOGGERgger Appender -->
+	<appender name="RootDailyRollAppender"
+			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${ROOT_LOG_DIR}/root.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${ROOT_LOG_DIR}/%d{yyyy/MM,aux}/root.%d{yyyyMMdd}.%i.log.zip</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches 200MB -->
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>--|%X{CLIENT_IP}|%X{X-B3-TraceId:-}|${APPLICATIONNAME}|%date{yyyy-MM-dd	HH:mm:ss.SSS}[%level][%thread][%logger]-%msg%n</pattern>
+		</encoder>
+	</appender>
+
+
+
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder charset="UTF-8">
+			<pattern>--|%X{CLIENT_IP}|%X{X-B3-TraceId:-}|${APPLICATIONNAME}|%date{yyyy-MM-dd	HH:mm:ss.SSS}[%level][%thread][%logger]-%msg%n</pattern>
+		</encoder>
+	</appender>
+
+
+	<appender name="ZipKinDailyRollAppender"
+			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${ROOT_LOG_DIR}/zipkin.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${ROOT_LOG_DIR}/%d{yyyy/MM,aux}/zipkin.%d{yyyyMMdd}.%i.log.zip</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches 200MB -->
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="ServiceCallInfoAppender"
+			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${CALL_LOG_DIR}/ServiceCallInfo.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${ROOT_LOG_DIR}/%d{yyyy/MM,aux}/ServiceCallInfo.%d{yyyyMMdd}.%i.log.zip</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches 200MB -->
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%msg%n</pattern>
+		</encoder>
+	</appender>
+
+
+	<logger name="com.netflix.discovery.DiscoveryClient" level="INFO">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="RootDailyRollAppender" />
+	</logger>
+
+	<logger name="org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter" level="INFO">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="RootDailyRollAppender" />
+	</logger>
+	<logger name="com.netflix.loadbalancer.reactive.LoadBalancerCommand" level="DEBUG">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="RootDailyRollAppender" />
+	</logger>
+	<logger name="org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer" level="INFO">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="RootDailyRollAppender" />
+	</logger>
+	<logger name="org.springframework.boot.autoconfigure.SpringBootApplication" level="INFO">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="RootDailyRollAppender" />
+	</logger>
+	<logger name="org.springframework.boot.SpringApplication" level="INFO">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="RootDailyRollAppender" />
+	</logger>
+	<logger
+			name="com.yao.springcloud.sleuth.TraceZipkinSpanReporter" level="INFO" >
+		<appender-ref ref="ZipKinDailyRollAppender" />
+		<appender-ref ref="RootDailyRollAppender" />
+	</logger>
+
+	<root level="INFO">
+		<appender-ref ref="RootDailyRollAppender" />
+		<appender-ref ref="stdout" />
+	</root>
+</configuration>

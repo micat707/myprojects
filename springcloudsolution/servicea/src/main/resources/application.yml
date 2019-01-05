@@ -1,0 +1,5 @@
+server:
+  port: 8084
+logging:
+  path: c:/opt/applog/serviceA
+  level: INFO

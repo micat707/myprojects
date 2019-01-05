@@ -1,0 +1,5 @@
+server:
+  port: 8086
+logging:
+  path: c:/opt/applog/zuul
+  level: INFO

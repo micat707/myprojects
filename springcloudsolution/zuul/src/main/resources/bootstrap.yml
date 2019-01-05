@@ -1,0 +1,41 @@
+spring:
+    sleuth:
+       sampler:
+           percentage: 1.0
+    application:
+      name: zuul
+server:
+    port: 8086
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:8081/eureka/
+    instance:
+        preferIpAddress: true
+        ipAddress: localhost
+zuul :
+    traceRequestBody: false
+    ignoredServices: '*'
+    sensitiveHeaders: Cookie,Set-Cookie
+    DebugFilter:
+        pre:
+            disable: true
+    routes:
+        serviceA:
+            path: /**/say*/**
+            serviceId: serviceA
+hystrix:
+    command:
+        serviceA:
+            execution:
+                timeout:
+                    enabled: true
+                isolation:
+                    semaphore:
+                        maxConcurrentRequests: 100000
+                    strategy: SEMAPHORE
+                    thread:
+                        timeoutInMilliseconds: 40000
+ribbon:
+  ReadTimeout: 40000
+  ConnectTimeout: 40000
