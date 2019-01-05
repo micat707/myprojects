@@ -1,6 +1,6 @@
 package com.yao.springcloud.config;
 
-import com.yao.springcloud.filters.TraceFilter;
+import com.yao.springcloud.filters.TracePreFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class ZuulConfig {
 
     @Bean
-    public TraceFilter getTraceFilter(){
-        return new TraceFilter();
+    public TracePreFilter getTraceFilter(){
+        return new TracePreFilter();
     }
 }

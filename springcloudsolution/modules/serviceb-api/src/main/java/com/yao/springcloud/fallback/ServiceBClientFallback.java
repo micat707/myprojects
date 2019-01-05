@@ -9,7 +9,7 @@ public class ServiceBClientFallback implements ServiceBInterface {
 
 
 	@Override
-	public String saybhello(String name) {
+	public String saybHello(String name) {
 		return "call B service failed!";
 	}
 }

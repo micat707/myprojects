@@ -9,7 +9,7 @@ public class ServiceA {
     @Autowired
     private ServiceBInterface serviceBInterface;
 
-    public String sayhello(String name){
-        return serviceBInterface.saybhello(name);
+    public String sayHello(String name){
+        return serviceBInterface.saybHello(name);
     }
 }

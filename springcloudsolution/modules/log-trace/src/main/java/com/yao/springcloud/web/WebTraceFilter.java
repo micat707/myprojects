@@ -18,10 +18,12 @@ public class WebTraceFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
         String clientIp = httpServletRequest.getHeader(ConstantsName.CLIENT_IP);
-        if(StringUtils.isEmpty(clientIp)){//如果为空，则表示第一次访问，即网关端的请求
-            clientIp = httpServletRequest.getRemoteAddr();
+        if(StringUtils.isNotEmpty(clientIp)){//如果为空，则表示第一次访问，即网关端的请求
+            MDC.put(ConstantsName.CLIENT_IP, clientIp);
         }
-        MDC.put(ConstantsName.CLIENT_IP, clientIp);
         filterChain.doFilter(httpServletRequest, httpServletResponse);
+        //确保每个应用处理完后 清除相关MDC的内容
+        MDC.remove(ConstantsName.CLIENT_IP);
+
     }
 }

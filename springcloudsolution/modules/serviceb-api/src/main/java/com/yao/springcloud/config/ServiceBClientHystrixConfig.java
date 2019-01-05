@@ -13,7 +13,7 @@ public class ServiceBClientHystrixConfig {
      */
    public ServiceBClientHystrixConfig(){
        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.ServiceBInterface#" +
-               "saybhello(String)." +
+               "saybHello(String)." +
                "execution.isolation.thread.timeoutInMilliseconds", 50000);
 
    }

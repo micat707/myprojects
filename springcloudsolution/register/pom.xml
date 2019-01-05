@@ -5,7 +5,7 @@
 		<groupId>com.yao.springcloud</groupId>
 		<artifactId>parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/>
+		<relativePath>../parent</relativePath>
 	</parent>
 	<artifactId>register</artifactId>
 	<version>0.0.1-SNAPSHOT</version>

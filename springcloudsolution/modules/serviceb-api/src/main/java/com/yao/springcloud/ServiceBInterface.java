@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value = "serviceb", fallbackFactory =
         ServiceBClientFallbackFactory.class)
 public interface ServiceBInterface {
-    @RequestMapping(value="/saybhello",method = RequestMethod
+    @RequestMapping(value="/saybHello",method = RequestMethod
             .GET)
-    String saybhello(@RequestParam("name") String name);
+    String saybHello(@RequestParam("name") String name);
 }
