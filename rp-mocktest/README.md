@@ -23,7 +23,7 @@ rpmock即通过record（将返回结果写入文件）、 replay（读取文件�
 # 使用方式
 本mock适用于对使用spring 管理的bean进行mock。
 ## 实现JsonRpMockHelper的子类
-参考BaiduRpMock的实现。其中，需要实现isNeedMock及judgeNeedContinue方法。
+参考[BaiduRpMock](https://github.com/micat707/myprojects/blob/master/rp-mocktest/src/test/java/com/yao/test/mockimpl/BaiduRpMock.java)的实现。其中，需要实现isNeedMock及judgeNeedContinue方法。
 
 其中：
 
@@ -32,7 +32,7 @@ rpmock即通过record（将返回结果写入文件）、 replay（读取文件�
 （2）judgeNeedContinue 如果返回为true，则说明需要递归检查是否还有需要mock的字段。
 
 ## 在单元测试中进行mock的使用
-参考TestProxyMock的使用方式。概括可为:
+参考[TestProxyMock](https://github.com/micat707/myprojects/blob/master/rp-mocktest/src/test/java/com/yao/test/testcase/proxy/TestProxyMock.java)的使用方式。概括可为:
 
 （1）对JsonRpMockHelper的子类实例化。比如：BaiduRpMock baiduRpMock = new BaiduRpMock();
 
