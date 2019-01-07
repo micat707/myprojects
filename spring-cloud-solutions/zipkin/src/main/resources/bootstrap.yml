@@ -1,0 +1,9 @@
+spring:
+    application:
+        name: zipkin
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:8081/eureka/
+    instance:
+        preferIpAddress: true

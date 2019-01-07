@@ -20,5 +20,6 @@
 		<module>modules/log-trace</module>
 		<module>modules/common-utils</module>
 		<module>zuul</module>
+		<module>zipkin</module>
 	</modules>
 </project>
