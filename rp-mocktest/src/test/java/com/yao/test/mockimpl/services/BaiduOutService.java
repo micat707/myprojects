@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BaiduOutService implements SearchKeyApi {
+public class BaiduOutService {
     @Autowired
     private BaiduService baiduService;
-    public String searchKey(){
-        return  baiduService.searchKey();
+    public String searchKey(String keyWord){
+        return  baiduService.searchKey(keyWord);
     }
 }

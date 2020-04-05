@@ -27,19 +27,13 @@ public class RecordMethodInterceptor extends BaseMethodInterceptor {
     }
 
     @Override
-    protected Object invoke(Object proxyObj, Method m, Object[] args,
-                            MethodProxy proxy) throws Throwable {
-        try {
-            LOG.info("Record Class:{},Method:{},Args:{}", new Object[] {
-                    m.getClass(), m.getName(), Arrays.deepToString(args) });
-            Object result = proxy.invoke(target, args);
-            record(m,args, result);
-            return result;
-        } catch (Exception e) {
-            // 记录异常
-            record(m,args, e);
-            throw e;
-        }
+    protected Object invoke(Object proxyObj, Method orgMethod, Object[] args,
+                            MethodProxy proxyMethod) throws Throwable {
+        LOG.info("Record Class:{},Method:{},Args:{}", new Object[] {
+                orgMethod.getClass(), orgMethod.getName(), Arrays.deepToString(args) });
+        Object result = proxyMethod.invoke(target, args);
+        record(orgMethod,args, result);
+        return result;
     }
     public void record(Method m, Object[] args, Object result){
         String fileName = "";

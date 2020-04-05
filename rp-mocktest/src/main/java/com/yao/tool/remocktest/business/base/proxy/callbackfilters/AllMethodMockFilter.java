@@ -31,20 +31,20 @@ public class AllMethodMockFilter extends MockFilter {
 		super(queryAccessibleMethods(target));
 	}
 
+
 	/**
 	 * 查询可访问的方法
 	 * @param target
 	 * @return
 	 */
-	 private static List<String> queryAccessibleMethods(Object target) {
-	    	List<String> methodNameList;
-	    	methodNameList = ClassUtil.queryAccessibleMethodList(target.getClass());
-	    	List<String> notMockList = NOT_MOCK_METHOD_LIST.get();
-	    	if(notMockList != null && !notMockList.isEmpty()){
-	    		methodNameList.removeAll(notMockList);
-	    	}
-	    	
-	        return methodNameList;
-	  }
-	
+	private static List<String> queryAccessibleMethods(Object target) {
+		List<String> methodNameList;
+		methodNameList = ClassUtil.queryAccessibleMethodList(target.getClass());
+		List<String> notMockList = NOT_MOCK_METHOD_LIST.get();
+		if(notMockList != null && !notMockList.isEmpty()){
+			methodNameList.removeAll(notMockList);
+		}
+
+		return methodNameList;
+	}
 }

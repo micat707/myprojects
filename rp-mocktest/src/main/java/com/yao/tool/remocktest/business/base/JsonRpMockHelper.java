@@ -14,13 +14,7 @@ public abstract class JsonRpMockHelper extends  BaseRpMock {
     }
 
     @Override
-    protected abstract boolean isNeedMock(String inputClassCanonicalName);
-
-    @Override
-    protected abstract boolean judgeNeedContinue(Field field);
-
-    @Override
-    protected MockFileNameGeneratorAbstract generaterRPMockFileNameJsonGenerator() {
+    protected MockFileNameGeneratorAbstract generaterRPMockFileNameGenerator() {
         return new RPMockFileNameJsonGenerator();
     }
 }

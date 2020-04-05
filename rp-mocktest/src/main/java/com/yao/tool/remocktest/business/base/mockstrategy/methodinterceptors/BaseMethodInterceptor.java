@@ -7,11 +7,10 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public abstract class BaseMethodInterceptor  implements MethodInterceptor {
+public abstract class BaseMethodInterceptor implements MethodInterceptor {
     private static final Logger log = LoggerFactory.getLogger(BaseMethodInterceptor.class);
 
 
@@ -31,11 +30,10 @@ public abstract class BaseMethodInterceptor  implements MethodInterceptor {
     protected Object target;
 
 
-
     /**
      * @param
      */
-    public BaseMethodInterceptor(Object target,MockFileNameGenerator fileNameGenerator, ClassFileParseApi
+    public BaseMethodInterceptor(Object target, MockFileNameGenerator fileNameGenerator, ClassFileParseApi
             classParseGenerator) {
         this.target = target;
         this.fileNameGenerator = fileNameGenerator;
@@ -47,29 +45,27 @@ public abstract class BaseMethodInterceptor  implements MethodInterceptor {
         Object result = null;
         try {
             result = invoke(obj, m, args, proxy);
-        } catch (InvocationTargetException e) {
-            log.error("InvocationTargetException error ", e);
-            throw e;
         } catch (Exception e) {
             log.error("invoke unknown error ", e);
             throw e;
         } finally {
-            log.info("Method:{},Args:{},Return:{}", new Object[] { m.getName(),
-                    Arrays.deepToString(args), result });
+            log.info("Method:{},Args:{},Return:{}", new Object[]{m.getName(),
+                    Arrays.deepToString(args), result});
         }
         return result;
     }
 
     /**
      * 拦截器方法，用于控制replay,record的行为
+     *
      * @param proxyObj Dynamic proxy object
-     * @param m method
-     * @param args method args
+     * @param m        method
+     * @param args     method args
      * @param proxy
      * @return
      * @throws Throwable
      */
-    protected abstract Object invoke(Object proxyObj, Method m, Object[] args,
+    protected abstract Object invoke(Object obj, Method m, Object[] args,
                                      MethodProxy proxy) throws Throwable;
 
 

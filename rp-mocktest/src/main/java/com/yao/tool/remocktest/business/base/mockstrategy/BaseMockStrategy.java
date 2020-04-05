@@ -14,19 +14,18 @@ import net.sf.cglib.proxy.NoOp;
 public abstract class BaseMockStrategy {
     public   <T> T createTestMock(T target,
                                              MockFileNameGenerator fileNameGenerator, ClassFileParseApi
-                                                     classParseGenerator, RPMockEnum mp, Class<?> proxyClass) {
+                                                     classParseGenerator, RPMockEnum mp, Class<?> mockClassType) {
 
 
         T result;
         if(mp == RPMockEnum.RECORD){
             RecordMethodInterceptor recordMockHandlerImpl = new RecordMethodInterceptor(target, fileNameGenerator, classParseGenerator);
-            result = createProxy(target,proxyClass,
+            result = createProxy(target, mockClassType,
                     createHandlers(target,recordMockHandlerImpl), createFilters(target));
         }else{
-            //replay 不需要 target
             ReplayMethodInterceptor replayMethodInterceptor = new ReplayMethodInterceptor(null, fileNameGenerator,
                     classParseGenerator);
-            result = createProxy(target,proxyClass,
+            result = createProxy(target, mockClassType,
                     createHandlers(target, replayMethodInterceptor), createFilters(target));
         }
         return result;
@@ -43,13 +42,13 @@ public abstract class BaseMockStrategy {
     /**
      * 创建代理回调方法
      * @param target 需要创建回调的对象
-     * @param baseRecordMockHandler 方法回调处理器
+     * @param baseMockHandler 方法回调处理器
      * @return 方法回调数组
      */
     private static Callback[] createHandlers(Object target,
-                                             BaseMethodInterceptor baseRecordMockHandler) {
+                                             BaseMethodInterceptor baseMockHandler) {
         return new Callback[] {
-                baseRecordMockHandler,
+                baseMockHandler,
                 NoOp.INSTANCE };
     }
 

@@ -16,8 +16,46 @@ public class RPMockHelper {
     /**
      * 已经mock的对象列表
      */
-    private static ThreadLocal<Map<String, List<String>>> ALREADY_MOCK_LIST = new ThreadLocal<Map<String, List<String>>>();
+    private static ThreadLocal<List<String>> ALREADY_MOCK_LIST = new ThreadLocal<List<String>>();
 
+
+    public static boolean isRealNeedMock(Field field, boolean isNeedMock, Object
+                                           needMockObject){
+        boolean isScan = false;
+        String inputClassCanonicalName = ClassUtil
+                .findFieldClassStr(field);
+        if (isNeedMock) {
+            //判断是否扫描过，如果扫描过，则跳过
+            if (ALREADY_MOCK_LIST.get() == null) {
+                ALREADY_MOCK_LIST.set(new ArrayList<String>());
+            }
+            List<String> tempResult;
+            if (ALREADY_MOCK_LIST.get().contains(inputClassCanonicalName)) {
+                isScan = true;
+            }
+            if (isScan) {//如果已经处理过，则不会再进行mock操作。
+                return false;
+            }else{
+                LoggerHelper.logInfo(RPMockHelper.class,
+                        "judgeNeedProcess",String.format("field %s of class %s  need processed!", field.getName(),
+                                needMockObject.getClass().getCanonicalName()) );
+                return true;
+            }
+
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isNotNeedProcess(Field field, Object
+                                            needMockObject){
+        boolean isFinal = ClassUtil.isFinal(field.getModifiers());
+        boolean isInnerClass = needMockObject.getClass().getModifiers() == 1042;
+        if(isFinal || isInnerClass){//内部类及final类不作处理
+            return true;
+        }
+        return false;
+    }
     /**
      * 判断实体对象是否是代理
      *
@@ -94,48 +132,5 @@ public class RPMockHelper {
 
 
 
-    public static boolean judgeNeedProcess(Field field, boolean needContinue, boolean needMock,
-                                           String caseFolderName, String classAndMockfieldCalssName, Object
-                                                   needMockObject) {
-        String inputClassCanonicalName = inputClassCanonicalName = ClassUtil
-                .findFieldClassStr(field);
-        boolean isNeedMock = needMock;
-        boolean isNeedContinue = !needContinue;
-        boolean isFinal = ClassUtil.isFinal(field.getModifiers());
-        boolean isScan = false;
-        boolean isInnerClass = needMockObject.getClass().getModifiers() == 1042;
-        boolean isNotNeedProcess = (!isNeedMock && !isNeedContinue) || isFinal || isInnerClass;
-        boolean needProcess = false;
-        if (!isNotNeedProcess) {
-            needProcess = true;
-            //判断是否扫描过，如果扫描过，则跳过
-            if (ALREADY_MOCK_LIST.get() == null) {
-                ALREADY_MOCK_LIST.set(new HashMap<String, List<String>>());
-            }
-            List<String> tempResult;
-            if (ALREADY_MOCK_LIST.get().containsKey(classAndMockfieldCalssName)) {
-                tempResult = ALREADY_MOCK_LIST.get().get(classAndMockfieldCalssName);
-                if (tempResult.contains(inputClassCanonicalName)) {
-                    isScan = true;
-                }
-            } else {
-                tempResult = new ArrayList<String>();
-                tempResult.add(classAndMockfieldCalssName);
-            }
-            ALREADY_MOCK_LIST.get().put(caseFolderName, tempResult);
-            if (isScan) {//如果已经处理过，则不会再进行mock操作。
-                needProcess = false;
-            }else{
-                LoggerHelper.logInfo(RPMockHelper.class,
-                        "judgeNeedProcess",String.format("field %s of class %s is already processed!", field.getName(),
-                                needMockObject.getClass().getCanonicalName()) );
-            }
-        }else{
-            LoggerHelper.logInfo(RPMockHelper.class,
-                    "judgeNeedProcess",String.format("field %s of class %s not need process!", field.getName(),
-                            needMockObject.getClass().getCanonicalName()) );
-        }
 
-        return needProcess;
-    }
 }

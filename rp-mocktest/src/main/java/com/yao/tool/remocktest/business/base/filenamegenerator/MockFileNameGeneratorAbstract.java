@@ -1,5 +1,6 @@
 package com.yao.tool.remocktest.business.base.filenamegenerator;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,17 +11,17 @@ public abstract class MockFileNameGeneratorAbstract {
     /**
      * methodCallMap
      */
-    private static final InheritableThreadLocal<Map<String, Integer>> METHODCALLMAP = new InheritableThreadLocal<Map<String, Integer>>() {
+    private static final ThreadLocal<Map<String, Integer>> METHOD_CALL_MAP = new InheritableThreadLocal<Map<String, Integer>>() {
         public Map<String, Integer> initialValue() {
             return new HashMap<String, Integer>();
         }
     };
 
     /**
-     * CASENAMELIST:   存放用例名
+     * CASE_NAME_LIST:   存放用例名
      *
      */
-    private static final InheritableThreadLocal<List<String>> CASENAMELIST = new InheritableThreadLocal<List<String>>() {
+    private static final ThreadLocal<List<String>> CASE_NAME_LIST = new InheritableThreadLocal<List<String>>() {
         public List<String> initialValue() {
             return new ArrayList<String>();
         }
@@ -41,31 +42,32 @@ public abstract class MockFileNameGeneratorAbstract {
      * @since Ver1.1
      */
     public MockFileNameGenerator createFileNameGenerator(
-            final String folderName, final String caseName,
-            final String className, final String fieldName) {
-
+            final String testUntiName, final String caseName,
+            final String fieldClassName, final String fieldName) {
+        final String folderName = "" + testUntiName + File.separator + caseName
+                + File.separator;
         MockFileNameGenerator result = new MockFileNameGenerator() {
 
             @Override
             public String createFileName(Method m, Object[] args) {
                 int callTime = 0;
 
-                String callKey = buildCallKey(caseName, className, m, fieldName);
-                if (!CASENAMELIST.get().contains(caseName)) {// 每个用例前清空
-                    METHODCALLMAP.get().remove(callKey);
-                    CASENAMELIST.get().add(caseName);
+                String callKey = buildCallKey(caseName, fieldClassName, m, fieldName);
+                if (!CASE_NAME_LIST.get().contains(caseName)) {// 每个用例前清空
+                    METHOD_CALL_MAP.get().remove(callKey);
+                    CASE_NAME_LIST.get().add(caseName);
                 }
-                if (METHODCALLMAP.get().get(callKey) == null) {
+                if (METHOD_CALL_MAP.get().get(callKey) == null) {
                     callTime = 1;
                 } else {
-                    callTime = METHODCALLMAP.get().get(callKey);
                     // 上次调用之后，次数+1
+                    callTime = METHOD_CALL_MAP.get().get(callKey);
                     callTime++;
 
                 }
-                METHODCALLMAP.get().put(callKey, callTime);
+                METHOD_CALL_MAP.get().put(callKey, callTime);
                 String fullFileName = createCurrentFileName(m, args,
-                        className,caseName, callTime, fieldName);
+                        fieldClassName,caseName, callTime, fieldName);
                 return folderName + fullFileName;
             }
         };
@@ -103,14 +105,4 @@ public abstract class MockFileNameGeneratorAbstract {
     protected abstract String createCurrentFileName(Method m, Object[] args,
                                                     String methodClassName,String caseName, int callTime, String
                                                             fieldName);
-
-    /**
-     * resetThreadLocalInfo:   void
-     * @author：micat707   重置本地线程变量
-     * @date：2016年4月19日 上午9:40:56
-     */
-    public static void resetThreadLocalInfo(){
-        METHODCALLMAP.get().clear();
-        CASENAMELIST.get().clear();
-    }
 }

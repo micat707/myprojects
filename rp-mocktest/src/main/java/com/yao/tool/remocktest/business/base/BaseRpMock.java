@@ -14,7 +14,6 @@ import com.yao.tool.remocktest.business.base.validate.InputParamValidate;
 import com.yao.tool.remocktest.utils.classes.ClassUtil;
 import com.yao.tool.remocktest.utils.log.LoggerHelper;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,8 @@ public abstract class BaseRpMock implements RPMockApi {
 
     @Override
     public <T> T mockObject(T entity, RPMockEnum mp, Class<?> mockTestClass, String caseName) {
+        InputParamValidate
+                .validInputParam(entity, mp, mockTestClass, caseName);
         return this.mockObject(entity, mp, mockTestClass.getSimpleName(),
                 caseName);
     }
@@ -39,27 +40,7 @@ public abstract class BaseRpMock implements RPMockApi {
      */
     private <T> T mockObject(T entity, RPMockEnum mp, String mockFile,
                              String caseName) {
-        InputParamValidate
-                .validInputParam(entity, mp, mockFile, caseName);
-        T result = null;
-
-        if (entity == null) {
-            return entity;
-        }
-        Object oldEntityObject = entity;
-        if (RPMockHelper.judgeIsProxy(entity)) {
-            LoggerHelper.logInfo(BaseRpMock.class, "mockObject", String.format("动态代理不进行内部mock %s",
-                    entity
-                            .getClass().getCanonicalName()));
-
-           throw new RPMockException(String.format("Do not process proxy entity! entity is %s", entity.getClass()));
-            //entity = (T) RPMockHelper.findProxyProject(entity);
-        } else {
-            // process normal class
-            result = processNormalClass(entity, mp, mockFile, caseName);
-        }
-
-        return result;
+        return processNormalClass(entity, mp, mockFile, caseName);
 
     }
 
@@ -76,8 +57,7 @@ public abstract class BaseRpMock implements RPMockApi {
             throw new RPMockException(String.format("实体没有需要处理的field,实体为：%s", entity.getClass().getCanonicalName()));
         }
 
-        String foldName = "" + mockFile + File.separator + caseName
-                + File.separator;
+        String foldName = mockFile;
 
         List<String> notMockMethodList = iniNotMockMethodList();
         iniAllMethodMockFilterNotMockMethodList(notMockMethodList);
@@ -104,24 +84,20 @@ public abstract class BaseRpMock implements RPMockApi {
             declareField.setAccessible(true);
             targetObj = declareField.get(entity);
             mockObject = targetObj;
-            String classAndMockfieldCalssName = entity.getClass()
-                    .getCanonicalName() + "->" + inputClassCanonicalName;
-            boolean isNeedMock = isNeedMock(inputClassCanonicalName);
-            boolean isNeedContinue = !judgeNeedContinue(declareField);
-            boolean isNeedProcess = RPMockHelper.judgeNeedProcess(declareField, isNeedContinue, isNeedMock,
-                    foldName, classAndMockfieldCalssName, mockObject);
-            if (!isNeedProcess) {
+            boolean isNotNeedProcess = RPMockHelper.isNotNeedProcess(declareField, mockObject);
+            if (isNotNeedProcess) {
                 return;
             }
-
-
+            boolean isNeedMock = isNeedMock(inputClassCanonicalName);
+            isNeedMock = RPMockHelper.isRealNeedMock(declareField, isNeedMock,mockObject);
+            boolean isNeedContinue = !judgeNeedContinue(declareField);
             if (isNeedMock) {
                 // 判断 该域名是否需要递归mock
                 if (targetObj == null) {
                     throw new RPMockException(classObject.getSimpleName()
                             + "的" + fieldName + "属性值为null");
                 }
-                MockFileNameGeneratorAbstract mockFileNameGeneratorAbstract = generaterRPMockFileNameJsonGenerator();
+                MockFileNameGeneratorAbstract mockFileNameGeneratorAbstract = generaterRPMockFileNameGenerator();
 
                 MockFileNameGenerator fileNameGenerator = mockFileNameGeneratorAbstract
                         .createFileNameGenerator(foldName, caseName,
@@ -132,12 +108,15 @@ public abstract class BaseRpMock implements RPMockApi {
                         declareField.getType());
 
             } else {// 看不需要mock的类 是否有需要mock的字段， 递归调用
-                mockSb.append(",not mock tab，but mock continue"
-                        + classObject.getCanonicalName() + "->"
-                        + fieldName + ",fieldClass is"
-                        + inputClassCanonicalName);
+                if(isNeedContinue){
+                    mockSb.append(",not mock tab，but mock continue"
+                            + classObject.getCanonicalName() + "->"
+                            + fieldName + ",fieldClass is"
+                            + inputClassCanonicalName);
 
-                mockObject = mockObject(targetObj, mp, mockFile, caseName);
+                    mockObject = mockObject(targetObj, mp, mockFile, caseName);
+                }
+
             }
             declareField.set(entity, mockObject);
         } catch (Exception e) {
@@ -184,7 +163,7 @@ public abstract class BaseRpMock implements RPMockApi {
 
     protected abstract boolean judgeNeedContinue(Field field);
 
-    protected abstract MockFileNameGeneratorAbstract generaterRPMockFileNameJsonGenerator();
+    protected abstract MockFileNameGeneratorAbstract generaterRPMockFileNameGenerator();
 
     protected List<String> iniNotMockMethodList() {
         return new ArrayList<String>();
